@@ -384,7 +384,7 @@ std::tuple<jclass, jfieldID, jmethodID, jmethodID> BuildDex(JNIEnv *env, jobject
                                       : TypeDescriptor::FromDescriptor(static_cast<char>(param)));
     }
     
-    std::string generated_class_name = generated_class_name+class_name.data();
+    //std::string generated_class_name = generated_class_name+class_name.data();
     ClassBuilder cbuilder{dex_file.MakeClass(generated_class_name)};
     if (!generated_source_name.empty()) cbuilder.set_source_file(generated_source_name);
 
