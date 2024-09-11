@@ -82,7 +82,6 @@ auto [trampoline, entry_point_offset, art_method_offset] = GetTrampoline();
 jmethodID method_get_name = nullptr;
 jmethodID method_get_declaring_class = nullptr;
 jmethodID class_get_name = nullptr;
-jmethodID class_get_simple_name = nullptr;
 jmethodID class_get_class_loader = nullptr;
 jmethodID class_get_declared_constructors = nullptr;
 jfieldID class_access_flags = nullptr;
@@ -99,7 +98,7 @@ jmethodID method_get_return_type = nullptr;
 jmethodID path_class_loader_init = nullptr;
 
 constexpr auto kInternalMethods = std::make_tuple(
-    &method_get_name, &method_get_declaring_class, &class_get_name, &class_get_simple_name, &class_get_class_loader,
+    &method_get_name, &method_get_declaring_class, &class_get_name, &class_get_class_loader,
     &class_get_declared_constructors, &dex_file_init, &dex_file_init_with_cl, &load_class,
     &set_accessible, &method_get_parameter_types, &method_get_return_type, &path_class_loader_init);
 
@@ -186,12 +185,6 @@ bool InitJNI(JNIEnv *env) {
 
     if (class_get_name = JNI_GetMethodID(env, clazz, "getName", "()Ljava/lang/String;");
         !class_get_name) {
-        LOGE("Failed to find getName");
-        return false;
-    }
-
-       if (class_get_simple_name = JNI_GetMethodID(env, clazz, "getSimpleName", "()Ljava/lang/String;");
-        !class_get_simple_name) {
         LOGE("Failed to find getName");
         return false;
     }
@@ -391,7 +384,7 @@ std::tuple<jclass, jfieldID, jmethodID, jmethodID> BuildDex(JNIEnv *env, jobject
                                       : TypeDescriptor::FromDescriptor(static_cast<char>(param)));
     }
     
-    std::string generated_class_namen = std::string("LSPHooker_")+std::string(class_name);
+    std::string generated_class_namen = generated_class_name+std::string(class_name);
     ClassBuilder cbuilder{dex_file.MakeClass(generated_class_namen)};
     if (!generated_source_name.empty()) cbuilder.set_source_file(generated_source_name);
 
@@ -729,7 +722,7 @@ using ::lsplant::IsHooked;
         auto target_name =
             JNI_Cast<jstring>(JNI_CallObjectMethod(env, target_method, method_get_name));
         auto target_class_n =
-            JNI_Cast<jstring>(JNI_CallObjectMethod(env, target_class, class_get_simple_name));
+            JNI_Cast<jstring>(JNI_CallObjectMethod(env, target_class, class_get_name));
         JUTFString target_method_name(target_name);
         JUTFString target_class_name(target_class_n);
         auto callback_class = JNI_Cast<jclass>(
