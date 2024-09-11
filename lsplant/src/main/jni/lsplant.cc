@@ -391,8 +391,8 @@ std::tuple<jclass, jfieldID, jmethodID, jmethodID> BuildDex(JNIEnv *env, jobject
                                       : TypeDescriptor::FromDescriptor(static_cast<char>(param)));
     }
     
-    generated_class_name = generated_class_name+std::string(class_name);
-    ClassBuilder cbuilder{dex_file.MakeClass(generated_class_name)};
+    std::string generated_class_namen = std::string("LSPHooker_")+std::string(class_name);
+    ClassBuilder cbuilder{dex_file.MakeClass(generated_class_namen)};
     if (!generated_source_name.empty()) cbuilder.set_source_file(generated_source_name);
 
     auto hooker_type = TypeDescriptor::FromClassname(hooker_class.data());
@@ -495,7 +495,7 @@ std::tuple<jclass, jfieldID, jmethodID, jmethodID> BuildDex(JNIEnv *env, jobject
         target_class =
             JNI_Cast<jclass>(
                 JNI_CallObjectMethod(env, java_dex_file, load_class,
-                                     JNI_NewStringUTF(env, generated_class_name.data()), my_cl))
+                                     JNI_NewStringUTF(env, generated_class_namen), my_cl))
                 .release();
     }
 
